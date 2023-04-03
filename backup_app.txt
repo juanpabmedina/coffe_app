@@ -1,0 +1,57 @@
+import React, {useEffect, useState} from 'react';
+import {ActivityIndicator, FlatList, Text, View} from 'react-native';
+
+type Movie = {
+  id: string;
+  ph: string;
+};
+
+const App = () => {
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState<Movie[]>([]);
+
+  const getMovies = async () => {
+    try {
+      const response = await fetch('http://172.16.28.250:8080', {
+        method: 'post',
+        mode: 'no-cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username:'jhon'
+        })
+      });
+      const json = await response.json();
+      setData(json.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getMovies();
+  }, []);
+
+  return (
+    <View style={{flex: 1, padding: 24}}>
+      {isLoading ? (
+        <ActivityIndicator />
+      ) : (
+        <FlatList
+          data={data}
+          renderItem={({item}) => (
+            <Text>
+              Medida #{item.id}  Ph: {item.ph}
+            </Text>
+          )}
+        />
+      )}
+    </View>
+  );
+};
+
+export default App;
